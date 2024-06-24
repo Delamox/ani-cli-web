@@ -1,5 +1,5 @@
 var query = "";
-var episode = 0;
+var anime = "";
 
 document.getElementById("searchAnimeForm").addEventListener("submit", (e) => {
   e.preventDefault();
@@ -46,15 +46,47 @@ document.getElementById("selectAnimeForm").addEventListener("submit", (e) => {
 });
 
 function getEpisodes(data) {
-  episode = data;
-  console.log(`searching anime ${query} ep ${episode}`);
+  anime = data;
+  console.log(`searching anime ${query} select ${anime}`);
   fetch("http://localhost:8000/episode", {
     method: "POST",
     headers: { "Content-Type": "text/plain" },
-    body: JSON.stringify([query, episode]),
+    body: JSON.stringify([query, anime]),
   })
     .then((response) => response.json())
     .then((data) => {
-      appendAnimeList(data);
+      appendEpisodeList(data);
+    });
+}
+
+function appendEpisodeList(jsonData) {
+  console.log(jsonData);
+  let loc = document.getElementById("selectEpisodeInputBox");
+  for (let key in jsonData) {
+    let option = document.createElement("option");
+    option.innerHTML = jsonData[key];
+    option.value = key;
+    loc.append(option);
+  }
+}
+
+document.getElementById("selectEpisodeForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  let selectbox = document.getElementById("selectEpisodeInputBox");
+  var selected = selectbox.options[selectbox.selectedIndex].text;
+  geturl(selected);
+});
+
+function geturl(data) {
+  console.log(`searching anime ${query} select ${anime} episode ${data}`);
+  fetch("http://localhost:8000/link", {
+    method: "POST",
+    headers: { "Content-Type": "text/plain" },
+    body: JSON.stringify([query, anime, data]),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
     });
 }
