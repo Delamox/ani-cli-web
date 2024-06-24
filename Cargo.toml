@@ -1,0 +1,10 @@
+[package]
+name = "ani-cli-web"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+execute = "0.2.13"
+rocket = "0.5.1"
+serde_json = "1.0.117"
+tokio = "1.38.0"
