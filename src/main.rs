@@ -10,7 +10,7 @@ extern crate rocket;
 
 #[launch]
 fn rocket() -> _ {
-    let path = std::env::current_dir().unwrap();
+    let path = std::env::current_dir().unwrap().join("public");
     rocket::build()
         .mount("/", FileServer::from(path))
         .mount("/", routes![search, select_episode, get_link])
@@ -31,7 +31,7 @@ async fn search(data: Data<'_>) -> content::RawJson<String> {
         *i = ret
     }
     let json = serde_json::to_string(&list).unwrap();
-    println!("{}", json);
+    println!("sending anime list:\n{}", json);
     content::RawJson(json)
 }
 
@@ -39,7 +39,6 @@ async fn search(data: Data<'_>) -> content::RawJson<String> {
 async fn select_episode(data: Data<'_>) -> content::RawJson<String> {
     let stream = data.open(2.mebibytes()).into_string().await;
     let stream = stream.unwrap().clone().into_inner();
-    println!("{}", stream);
     let datavec: Vec<&str> = serde_json::from_str(stream.as_str()).unwrap();
     let apiresponse = spawn_process(datavec[0], datavec[1], "");
     let mut list: Vec<&str> = apiresponse.lines().collect();
@@ -49,7 +48,7 @@ async fn select_episode(data: Data<'_>) -> content::RawJson<String> {
         *i = ret
     }
     let json = serde_json::to_string(&list).unwrap();
-    println!("{}", json);
+    println!("sending episode list\n{}", json);
     content::RawJson(json)
 }
 
@@ -57,16 +56,18 @@ async fn select_episode(data: Data<'_>) -> content::RawJson<String> {
 async fn get_link(data: Data<'_>) -> content::RawText<String> {
     let stream = data.open(2.mebibytes()).into_string().await;
     let stream = stream.unwrap().clone().into_inner();
-    println!("{}", stream);
     let datavec: Vec<&str> = serde_json::from_str(stream.as_str()).unwrap();
     let apiresponse = spawn_process(datavec[0], datavec[1], datavec[2]);
     let ret = &apiresponse[5..].to_string();
-    println!(">{}<", ret);
+    println!("sending link:\n[{}]", ret);
     content::RawText(ret.to_owned())
 }
 
 fn spawn_process(query: &str, anime: &str, episode: &str) -> String {
-    println!("query >{}<", query);
+    println!(
+        "incoming POST:\nquery: {}\nanime: {}\nepisode: {}",
+        query, anime, episode
+    );
     let exec = env::current_dir().unwrap().join("ani.sh");
     let mut command = Command::new(exec);
     command.arg(query);
