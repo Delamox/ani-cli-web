@@ -1,6 +1,6 @@
 use execute::Execute;
 use rocket::data::{Data, ToByteUnit};
-use rocket::fs::FileServer;
+use rocket::fs::NamedFile;
 use rocket::response::content;
 use std::env;
 use std::process::{Command, Stdio};
@@ -10,10 +10,14 @@ extern crate rocket;
 
 #[launch]
 fn rocket() -> _ {
-    let path = std::env::current_dir().unwrap();
     rocket::build()
-        .mount("/", FileServer::from(path))
-        .mount("/", routes![search, select_episode, get_link])
+        .mount("/", routes![search, select_episode, get_link, index])
+}
+
+#[get("/")]
+async fn index () -> NamedFile {
+    let path = std::env::current_dir().unwrap().join("index.html");
+    NamedFile::open(&path).await.unwrap()
 }
 
 #[post("/search", data = "<data>")]
