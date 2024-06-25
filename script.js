@@ -1,8 +1,10 @@
 var query = "";
 var anime = "";
+var episode = "";
 ip = "http://localhost:8000";
 var animeform = document.getElementById("selectAnimeForm");
 var episodeform = document.getElementById("selectEpisodeForm");
+var mobilelink = document.getElementById("link");
 
 document.getElementById("searchAnimeForm").addEventListener("submit", (e) => {
   e.preventDefault();
@@ -18,6 +20,9 @@ function searchQuery(data) {
   query = data;
   animeform.style.display = "none";
   episodeform.style.display = "none";
+  mobilelink.style.display = "none";
+  anime = "";
+  episode = "";
   serv = ip + "/search";
   console.log(serv);
   fetch(serv, {
@@ -57,6 +62,8 @@ document.getElementById("selectAnimeForm").addEventListener("submit", (e) => {
 function getEpisodes(data) {
   anime = data;
   episodeform.style.display = "none";
+  mobilelink.style.display = "none";
+  episode = "";
   console.log(`searching anime ${query} select ${anime}`);
   serv = ip + "/episode";
   console.log(serv);
@@ -93,6 +100,7 @@ document.getElementById("selectEpisodeForm").addEventListener("submit", (e) => {
 });
 
 function geturl(data) {
+  mobilelink.style.display = "none";
   console.log(`searching anime ${query} select ${anime} episode ${data}`);
   serv = ip + "/link";
   fetch(serv, {
@@ -108,14 +116,9 @@ function geturl(data) {
 
 function openVideo(url) {
   let fulllink = "https://bharadwajpro.github.io/m3u8-player/player/#" + url;
-  var windowSize =
-    "width=" +
-    window.innerWidth +
-    ",height=" +
-    window.innerHeight +
-    ",scrollbars=no";
-
-  window.open(fulllink, "popup", windowSize);
+  link.setAttribute("href", fulllink);
+  mobilelink.style.display = "block";
+  window.open(fulllink, "_blank");
   // document.getElementById("viewerdiv").createElement
   // document.getElementById("viewer").src = fullink;
   // document.getElementById("viewer").style.display = "block";
