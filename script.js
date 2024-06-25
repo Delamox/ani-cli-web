@@ -108,7 +108,14 @@ function geturl(data) {
 
 function openVideo(url) {
   let fulllink = "https://bharadwajpro.github.io/m3u8-player/player/#" + url;
-  window.open(fulllink);
+  var windowSize =
+    "width=" +
+    window.innerWidth +
+    ",height=" +
+    window.innerHeight +
+    ",scrollbars=no";
+
+  window.open(fulllink, "popup", windowSize);
   // document.getElementById("viewerdiv").createElement
   // document.getElementById("viewer").src = fullink;
   // document.getElementById("viewer").style.display = "block";
