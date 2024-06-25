@@ -1,5 +1,7 @@
 var query = "";
 var anime = "";
+var animeform = document.getElementById("selectAnimeForm");
+var episodeform = document.getElementById("selectEpisodeForm");
 
 document.getElementById("searchAnimeForm").addEventListener("submit", (e) => {
   e.preventDefault();
@@ -13,6 +15,8 @@ document.getElementById("searchAnimeForm").addEventListener("submit", (e) => {
 
 function searchQuery(data) {
   query = data;
+  animeform.style.display = "none";
+  episodeform.style.display = "none";
   fetch("http://localhost:8000/search", {
     method: "POST",
     headers: { "Content-Type": "text/plain" },
@@ -27,12 +31,14 @@ function searchQuery(data) {
 function appendAnimeList(jsonData) {
   console.log(jsonData);
   let loc = document.getElementById("selectAnimeInputBox");
+  loc.innerHTML = "";
   for (let key in jsonData) {
     let option = document.createElement("option");
     option.innerHTML = jsonData[key];
     option.value = key;
     loc.append(option);
   }
+  animeform.style.display = "block";
 }
 
 document.getElementById("selectAnimeForm").addEventListener("submit", (e) => {
@@ -47,6 +53,7 @@ document.getElementById("selectAnimeForm").addEventListener("submit", (e) => {
 
 function getEpisodes(data) {
   anime = data;
+  episodeform.style.display = "none";
   console.log(`searching anime ${query} select ${anime}`);
   fetch("http://localhost:8000/episode", {
     method: "POST",
@@ -62,12 +69,14 @@ function getEpisodes(data) {
 function appendEpisodeList(jsonData) {
   console.log(jsonData);
   let loc = document.getElementById("selectEpisodeInputBox");
+  loc.innerHTML = "";
   for (let key in jsonData) {
     let option = document.createElement("option");
     option.innerHTML = jsonData[key];
     option.value = key;
     loc.append(option);
   }
+  episodeform.style.display = "block";
 }
 
 document.getElementById("selectEpisodeForm").addEventListener("submit", (e) => {
@@ -94,4 +103,6 @@ function geturl(data) {
 function openVideo(url) {
   let fulllink = "https://bharadwajpro.github.io/m3u8-player/player/#" + url;
   window.open(fulllink);
+  // document.getElementById("viewer").src = fullink;
+  // document.getElementById("viewer").style.display = "block";
 }

@@ -2,7 +2,6 @@ use execute::Execute;
 use rocket::data::{Data, ToByteUnit};
 use rocket::fs::FileServer;
 use rocket::response::content;
-use serde_json::Result;
 use std::env;
 use std::process::{Command, Stdio};
 

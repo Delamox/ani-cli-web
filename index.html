@@ -4,24 +4,25 @@
 <head>
   <meta charset="utf-8" />
   <title>LGR</title>
-  <!-- <script src="script.js"></script> -->
 </head>
 
 <body>
   <h1>lets get rusty!</h1>
+  <p>anime search engine</p>
   <div>
-    <form id="searchAnimeForm">
+    <form style="display: block" id="searchAnimeForm">
+      <button type="submit">Submit</button>
       <input type="text" id="searchAnimeInputBox" class="form-control" placeholder="search..." />
-      <button type="submit">Submit</button>
     </form>
-    <form id="selectAnimeForm">
+    <form style="display: none" id="selectAnimeForm">
+      <button type="submit">Submit</button>
       <select name="anime" id="selectAnimeInputBox"></select>
-      <button type="submit">Submit</button>
     </form>
-    <form id="selectEpisodeForm">
+    <form style="display: none" id="selectEpisodeForm">
+      <button type="submit">Submit</button>
       <select name="episode" id="selectEpisodeInputBox"></select>
-      <button type="submit">Submit</button>
     </form>
+    <!-- <iframe style="display: none" id="viewer" allowfullscreen src=""> -->
   </div>
   <script src="script.js"></script>
 </body>
