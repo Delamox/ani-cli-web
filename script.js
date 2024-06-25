@@ -85,8 +85,13 @@ function geturl(data) {
     headers: { "Content-Type": "text/plain" },
     body: JSON.stringify([query, anime, data]),
   })
-    .then((response) => response.json())
+    .then((response) => response.text())
     .then((data) => {
-      console.log(data);
+      openVideo(data);
     });
+}
+
+function openVideo(url) {
+  let fulllink = "https://bharadwajpro.github.io/m3u8-player/player/#" + url;
+  window.open(fulllink);
 }

@@ -57,8 +57,9 @@ async fn get_link(data: Data<'_>) -> content::RawText<String> {
     println!("{}", stream);
     let datavec: Vec<&str> = serde_json::from_str(stream.as_str()).unwrap();
     let apiresponse = spawn_process(datavec[0], datavec[1], datavec[2]);
-    println!(">{}<", apiresponse);
-    content::RawText(apiresponse)
+    let ret = &apiresponse[5..].to_string();
+    println!(">{}<", ret);
+    content::RawText(ret.to_owned())
 }
 
 fn spawn_process(query: &str, anime: &str, episode: &str) -> String {
