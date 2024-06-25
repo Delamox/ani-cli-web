@@ -1,6 +1,6 @@
 use execute::Execute;
 use rocket::data::{Data, ToByteUnit};
-use rocket::fs::NamedFile;
+use rocket::fs::FileServer;
 use rocket::response::content;
 use std::env;
 use std::process::{Command, Stdio};
@@ -10,16 +10,16 @@ extern crate rocket;
 
 #[launch]
 fn rocket() -> _ {
+    let path = std::env::current_dir().unwrap();
     rocket::build()
-        .mount("/", routes![search, select_episode, get_link, index])
+        .mount("/", FileServer::from(path))
+        .mount("/", routes![search, select_episode, get_link])
 }
-
-#[get("/")]
-async fn index () -> NamedFile {
-    let path = std::env::current_dir().unwrap().join("index.html");
-    NamedFile::open(&path).await.unwrap()
-}
-
+// #[get("/")]
+// async fn index () -> NamedFile {
+//     let path = std::env::current_dir().unwrap().join("index.html");
+//     NamedFile::open(&path).await.unwrap()
+// }
 #[post("/search", data = "<data>")]
 async fn search(data: Data<'_>) -> content::RawJson<String> {
     let stream = data.open(2.mebibytes()).into_string().await;

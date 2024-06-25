@@ -1,5 +1,6 @@
 var query = "";
 var anime = "";
+ip = "http://localhost:8000";
 var animeform = document.getElementById("selectAnimeForm");
 var episodeform = document.getElementById("selectEpisodeForm");
 
@@ -17,7 +18,9 @@ function searchQuery(data) {
   query = data;
   animeform.style.display = "none";
   episodeform.style.display = "none";
-  fetch("http://localhost:8000/search", {
+  serv = ip + "/search";
+  console.log(serv);
+  fetch(serv, {
     method: "POST",
     headers: { "Content-Type": "text/plain" },
     body: data,
@@ -55,7 +58,9 @@ function getEpisodes(data) {
   anime = data;
   episodeform.style.display = "none";
   console.log(`searching anime ${query} select ${anime}`);
-  fetch("http://localhost:8000/episode", {
+  serv = ip + "/episode";
+  console.log(serv);
+  fetch(serv, {
     method: "POST",
     headers: { "Content-Type": "text/plain" },
     body: JSON.stringify([query, anime]),
@@ -89,7 +94,8 @@ document.getElementById("selectEpisodeForm").addEventListener("submit", (e) => {
 
 function geturl(data) {
   console.log(`searching anime ${query} select ${anime} episode ${data}`);
-  fetch("http://localhost:8000/link", {
+  serv = ip + "/link";
+  fetch(serv, {
     method: "POST",
     headers: { "Content-Type": "text/plain" },
     body: JSON.stringify([query, anime, data]),
@@ -103,6 +109,7 @@ function geturl(data) {
 function openVideo(url) {
   let fulllink = "https://bharadwajpro.github.io/m3u8-player/player/#" + url;
   window.open(fulllink);
+  // document.getElementById("viewerdiv").createElement
   // document.getElementById("viewer").src = fullink;
   // document.getElementById("viewer").style.display = "block";
 }
