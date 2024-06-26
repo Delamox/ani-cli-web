@@ -52,7 +52,7 @@ async fn select_episode(data: Data<'_>) -> content::RawJson<String> {
 }
 
 #[post("/link", data = "<data>")]
-async fn get_link(data: Data<'_>) -> content::RawText<String> {
+async fn get_link(data: Data<'_>) -> content::RawJson<String> {
     let stream = data
         .open(2.mebibytes())
         .into_string()
@@ -62,8 +62,9 @@ async fn get_link(data: Data<'_>) -> content::RawText<String> {
     let datavec: Vec<&str> = serde_json::from_str(stream.as_str()).unwrap();
     let apiresponse = spawn_process(datavec[0], datavec[1], datavec[2]);
     let ret = &apiresponse[5..].to_string();
-    println!("\nsending link:\n[\"{}\"]\n", ret);
-    content::RawText(ret.to_owned())
+    let json = serde_json::to_string(&ret).unwrap();
+    println!("\nsending link:\n{}\n", json);
+    content::RawJson(json)
 }
 
 fn generatevec(apiresponse: &str) -> Vec<&str> {

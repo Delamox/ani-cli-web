@@ -6,16 +6,62 @@ var animeform = document.getElementById("selectAnimeForm");
 var episodeform = document.getElementById("selectEpisodeForm");
 var mobilelink = document.getElementById("link");
 
+//eventlisteners
 document.getElementById("searchAnimeForm").addEventListener("submit", (e) => {
   e.preventDefault();
-
   let search = document.getElementById("searchAnimeInputBox");
   if (!search.value == "") {
     console.log(`${search.value}`);
     searchQuery(search.value);
   }
 });
+document.getElementById("selectAnimeForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  let selectbox = document.getElementById("selectAnimeInputBox");
+  var selected = 1 + Number(selectbox.value);
+  var episodestring = selected.toString();
+  console.log(episodestring);
+  getEpisodes(episodestring);
+});
+document.getElementById("selectEpisodeForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  let selectbox = document.getElementById("selectEpisodeInputBox");
+  var selected = selectbox.options[selectbox.selectedIndex].text;
+  geturl(selected);
+});
 
+//generic functions
+function postdata(data, url, type) {
+  fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain" },
+    body: data,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      action(data, type);
+    });
+}
+function action(data, type) {
+  if (type == "search") {
+    appendAnimeList(data);
+  } else if (type == "anime") {
+    appendEpisodeList(data);
+  } else if (type == "episode") {
+    openVideo(data);
+  }
+}
+function appendlist(element, json) {
+  element.innerHTML = "";
+  for (let key in json) {
+    let option = document.createElement("option");
+    option.innerHTML = json[key];
+    option.value = key;
+    element.append(option);
+  }
+}
+
+//post functions
 function searchQuery(data) {
   query = data;
   animeform.style.display = "none";
@@ -25,40 +71,8 @@ function searchQuery(data) {
   episode = "";
   serv = ip + "/search";
   console.log(serv);
-  fetch(serv, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain" },
-    body: data,
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      appendAnimeList(data);
-    });
+  postdata(data, serv, "search");
 }
-
-function appendAnimeList(jsonData) {
-  console.log(jsonData);
-  let loc = document.getElementById("selectAnimeInputBox");
-  loc.innerHTML = "";
-  for (let key in jsonData) {
-    let option = document.createElement("option");
-    option.innerHTML = jsonData[key];
-    option.value = key;
-    loc.append(option);
-  }
-  animeform.style.display = "block";
-}
-
-document.getElementById("selectAnimeForm").addEventListener("submit", (e) => {
-  e.preventDefault();
-
-  let selectbox = document.getElementById("selectAnimeInputBox");
-  var selected = 1 + Number(selectbox.value);
-  var episodestring = selected.toString();
-  console.log(episodestring);
-  getEpisodes(episodestring);
-});
-
 function getEpisodes(data) {
   anime = data;
   episodeform.style.display = "none";
@@ -67,59 +81,31 @@ function getEpisodes(data) {
   console.log(`searching anime ${query} select ${anime}`);
   serv = ip + "/episode";
   console.log(serv);
-  fetch(serv, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain" },
-    body: JSON.stringify([query, anime]),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      appendEpisodeList(data);
-    });
+  postdata(JSON.stringify([query, data]), serv, "anime");
 }
-
-function appendEpisodeList(jsonData) {
-  console.log(jsonData);
-  let loc = document.getElementById("selectEpisodeInputBox");
-  loc.innerHTML = "";
-  for (let key in jsonData) {
-    let option = document.createElement("option");
-    option.innerHTML = jsonData[key];
-    option.value = key;
-    loc.append(option);
-  }
-  episodeform.style.display = "block";
-}
-
-document.getElementById("selectEpisodeForm").addEventListener("submit", (e) => {
-  e.preventDefault();
-
-  let selectbox = document.getElementById("selectEpisodeInputBox");
-  var selected = selectbox.options[selectbox.selectedIndex].text;
-  geturl(selected);
-});
-
 function geturl(data) {
   mobilelink.style.display = "none";
   console.log(`searching anime ${query} select ${anime} episode ${data}`);
   serv = ip + "/link";
-  fetch(serv, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain" },
-    body: JSON.stringify([query, anime, data]),
-  })
-    .then((response) => response.text())
-    .then((data) => {
-      openVideo(data);
-    });
+  postdata(JSON.stringify([query, anime, data]), serv, "episode");
 }
 
+//returndata functions
+function appendAnimeList(jsonData) {
+  console.log(jsonData);
+  let element = document.getElementById("selectAnimeInputBox");
+  appendlist(element, jsonData);
+  animeform.style.display = "block";
+}
+function appendEpisodeList(jsonData) {
+  console.log(jsonData);
+  let element = document.getElementById("selectEpisodeInputBox");
+  appendlist(element, jsonData);
+  episodeform.style.display = "block";
+}
 function openVideo(url) {
   let fulllink = "https://bharadwajpro.github.io/m3u8-player/player/#" + url;
   link.setAttribute("href", fulllink);
   mobilelink.style.display = "block";
   window.open(fulllink, "_blank");
-  // document.getElementById("viewerdiv").createElement
-  // document.getElementById("viewer").src = fullink;
-  // document.getElementById("viewer").style.display = "block";
 }
