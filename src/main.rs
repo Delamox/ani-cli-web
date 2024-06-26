@@ -22,50 +22,63 @@ fn rocket() -> _ {
 // }
 #[post("/search", data = "<data>")]
 async fn search(data: Data<'_>) -> content::RawJson<String> {
-    let stream = data.open(2.mebibytes()).into_string().await;
-    let apiresponse = spawn_process(stream.unwrap().into_inner().as_str(), "", "");
-    let mut list: Vec<&str> = apiresponse.lines().collect();
-    list.retain(|x| x.starts_with("acs: "));
-    for i in list.iter_mut() {
-        let ret: &str = &i[5..];
-        *i = ret
-    }
+    let stream = data
+        .open(2.mebibytes())
+        .into_string()
+        .await
+        .unwrap()
+        .into_inner();
+    let apiresponse = spawn_process(stream.as_str(), "", "");
+    let list = generatevec(apiresponse.as_str());
     let json = serde_json::to_string(&list).unwrap();
-    println!("sending anime list:\n{}", json);
+    println!("\nsending anime list:\n{}\n", json);
     content::RawJson(json)
 }
 
 #[post("/episode", data = "<data>")]
 async fn select_episode(data: Data<'_>) -> content::RawJson<String> {
-    let stream = data.open(2.mebibytes()).into_string().await;
-    let stream = stream.unwrap().clone().into_inner();
+    let stream = data
+        .open(2.mebibytes())
+        .into_string()
+        .await
+        .unwrap()
+        .into_inner();
     let datavec: Vec<&str> = serde_json::from_str(stream.as_str()).unwrap();
     let apiresponse = spawn_process(datavec[0], datavec[1], "");
+    let list = generatevec(apiresponse.as_str());
+    let json = serde_json::to_string(&list).unwrap();
+    println!("\nsending episode list\n{}\n", json);
+    content::RawJson(json)
+}
+
+#[post("/link", data = "<data>")]
+async fn get_link(data: Data<'_>) -> content::RawText<String> {
+    let stream = data
+        .open(2.mebibytes())
+        .into_string()
+        .await
+        .unwrap()
+        .into_inner();
+    let datavec: Vec<&str> = serde_json::from_str(stream.as_str()).unwrap();
+    let apiresponse = spawn_process(datavec[0], datavec[1], datavec[2]);
+    let ret = &apiresponse[5..].to_string();
+    println!("\nsending link:\n[\"{}\"]\n", ret);
+    content::RawText(ret.to_owned())
+}
+
+fn generatevec(apiresponse: &str) -> Vec<&str> {
     let mut list: Vec<&str> = apiresponse.lines().collect();
     list.retain(|x| x.starts_with("acs: "));
     for i in list.iter_mut() {
         let ret: &str = &i[5..];
         *i = ret
     }
-    let json = serde_json::to_string(&list).unwrap();
-    println!("sending episode list\n{}", json);
-    content::RawJson(json)
-}
-
-#[post("/link", data = "<data>")]
-async fn get_link(data: Data<'_>) -> content::RawText<String> {
-    let stream = data.open(2.mebibytes()).into_string().await;
-    let stream = stream.unwrap().clone().into_inner();
-    let datavec: Vec<&str> = serde_json::from_str(stream.as_str()).unwrap();
-    let apiresponse = spawn_process(datavec[0], datavec[1], datavec[2]);
-    let ret = &apiresponse[5..].to_string();
-    println!("sending link:\n[{}]", ret);
-    content::RawText(ret.to_owned())
+    list
 }
 
 fn spawn_process(query: &str, anime: &str, episode: &str) -> String {
     println!(
-        "incoming POST:\nquery: {}\nanime: {}\nepisode: {}",
+        "\nincoming POST:\nquery: {}\nanime: {}\nepisode: {}\n",
         query, anime, episode
     );
     let exec = env::current_dir().unwrap().join("ani.sh");
