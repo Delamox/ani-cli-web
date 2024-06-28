@@ -15,11 +15,7 @@ fn rocket() -> _ {
         .mount("/", FileServer::from(path))
         .mount("/", routes![search, select_episode, get_link])
 }
-// #[get("/")]
-// async fn index () -> NamedFile {
-//     let path = std::env::current_dir().unwrap().join("index.html");
-//     NamedFile::open(&path).await.unwrap()
-// }
+
 #[post("/search", data = "<data>")]
 async fn search(data: Data<'_>) -> content::RawJson<String> {
     let stream = data

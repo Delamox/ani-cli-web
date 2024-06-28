@@ -104,7 +104,7 @@ function appendEpisodeList(jsonData) {
   episodeform.style.display = "block";
 }
 function openVideo(url) {
-  let fulllink = "https://bharadwajpro.github.io/m3u8-player/player/#" + url;
+  let fulllink = ip + "/player/#" + url;
   link.setAttribute("href", fulllink);
   mobilelink.style.display = "block";
   window.open(fulllink, "_blank");
